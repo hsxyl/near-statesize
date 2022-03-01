@@ -1,18 +1,13 @@
 mod macro_rules;
 
 use std::collections::HashMap;
+use near_sdk::borsh::{BorshDeserialize, BorshSerialize};
 use near_sdk::collections::{TreeMap, UnorderedMap, UnorderedSet, Vector};
 pub use near_statesize_derive::*;
 
 pub trait NearStateSize {
-    /// sdf
     fn state_size(&self) -> usize;
 }
-
-//
-// In a real version of this library there would be lots more impls here, but
-// here are some interesting ones.
-//
 
 impl_near_statesize!(u8,1);
 impl_near_statesize!(u32,4);
@@ -29,14 +24,23 @@ impl NearStateSize for String {
     }
 }
 
-impl_near_statesize_iter!(Vec);
-impl_near_statesize_iter!(UnorderedSet);
-impl_near_statesize_iter_key_value!(HashMap);
-impl_near_statesize_iter_key_value!(UnorderedMap);
-impl_near_statesize_iter_key_value!(TreeMap);
+impl_near_statesize_iter!(Vec,4);
+impl_near_statesize_iter!(UnorderedSet,4);
+impl_near_statesize_iter_key_value!(HashMap,4);
+impl_near_statesize_iter_key_value!(UnorderedMap,4);
 
 impl <T> NearStateSize for Vector<T> {
     fn state_size(&self) -> usize {
         self.iter_raw().map(|e|e.len()).sum()
+    }
+}
+
+impl<K, V> NearStateSize for TreeMap<K, V>
+    where
+        K: NearStateSize+Ord + Clone + BorshSerialize + BorshDeserialize,
+        V: NearStateSize+BorshSerialize + BorshDeserialize,
+{
+    fn state_size(&self) -> usize {
+        self.iter().map(|(k,v)|k.state_size()+v.state_size()).sum()
     }
 }

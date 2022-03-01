@@ -1,5 +1,6 @@
 [workspace]
 members = [
+	"example",
 	"near_statesize",
 	"near_statesize_derive"
 ]
