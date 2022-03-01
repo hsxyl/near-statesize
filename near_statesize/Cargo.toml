@@ -1,0 +1,10 @@
+[package]
+name = "near_statesize"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+near_statesize_derive = {path = "../near_statesize_derive"}
+near-sdk = "3.1.0"
